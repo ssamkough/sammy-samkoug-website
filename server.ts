@@ -16,6 +16,7 @@ for await (const conn of server) {
 
 async function serve(conn: Deno.Conn) {
   const httpConn = Deno.serveHttp(conn);
+
   for await (const requestEvent of httpConn) {
     const requestUrl = requestEvent.request.url;
     const path = new URL(requestUrl).pathname;
@@ -30,7 +31,8 @@ async function serve(conn: Deno.Conn) {
           headers: { "content-type": "text/html; charset=utf-8" },
           status: 200,
         });
-        return requestEvent.respondWith(response);
+        requestEvent.respondWith(response);
+        break;
       }
       case "/styles.css": {
         const file = await Deno.readFile(
@@ -41,11 +43,12 @@ async function serve(conn: Deno.Conn) {
             "content-type": "text/css",
           },
         });
-        return requestEvent.respondWith(response);
+        requestEvent.respondWith(response);
+        break;
       }
       default: {
         const response = new Response("404");
-        return requestEvent.respondWith(response);
+        requestEvent.respondWith(response);
       }
     }
   }
