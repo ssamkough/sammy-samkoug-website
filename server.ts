@@ -8,6 +8,7 @@ const JPG_FILE_TYPE = ".jpg";
 const FILES = {
   "/": "index",
   "/about": "about",
+  "/contact": "contact",
   "/adventures": "adventures",
   "/latin-america-2023-trip": "latin-america-2023-trip",
   "/styles.css": "styles",
@@ -33,10 +34,12 @@ async function serve(conn: Deno.Conn) {
 }
 
 async function response(path: string) {
+  // TODO: read the 'public/pages', 'public/assets', 'public/styles' directory
   console.log("path", path);
   switch (path) {
     case "/":
     case "/about":
+    case "/contact":
     case "/adventures":
     case "/latin-america-2023-trip":
       return await page(path);
@@ -57,12 +60,19 @@ async function response(path: string) {
 }
 
 async function page(
-  path: "/" | "/about" | "/adventures" | "latin-america-2023-trip" | string
+  path:
+    | "/"
+    | "/about"
+    | "/contact"
+    | "/adventures"
+    | "latin-america-2023-trip"
+    | string
 ) {
   let page;
   switch (path) {
     case "/":
     case "/about":
+    case "/contact":
     case "/adventures":
     case "/latin-america-2023-trip": {
       page = await Deno.readTextFile(
