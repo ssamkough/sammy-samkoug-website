@@ -1,3 +1,5 @@
+import { serve } from "https://deno.land/std@0.202.0/http/server.ts";
+
 const SRC_DIRECTORY = "public/";
 const ASSETS_DIRECTORY = "assets/";
 const HTML_FILE_TYPE = ".html";
