@@ -1,5 +1,5 @@
 {
   "tasks": {
-    "dev": " deno run --allow-read --allow-net server.ts"
+    "dev": "deno run --allow-read --allow-net server.ts"
   }
 }
