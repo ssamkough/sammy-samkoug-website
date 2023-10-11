@@ -1,6 +1,1 @@
-[build]
-publish = "."
 
-[context.production]
-publish = "public/"
-command = "deno run --allow-read --allow-net server.ts"
