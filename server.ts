@@ -1,21 +1,9 @@
-const SRC_DIRECTORY = "public/";
-const ASSETS_DIRECTORY = "assets/";
-const HTML_FILE_TYPE = ".html";
+const PUBLIC_DIRECTORY = "/public/";
+const PAGES_DIRECTORY = "pages/";
+const ASSETS_DIRECTORY = "/assets/";
 const TXT_FILE_TYPE = ".txt";
 const CSS_FILE_TYPE = ".css";
-const ICO_FILE_TYPE = ".ico";
-const JPG_FILE_TYPE = ".jpg";
-const FILES = {
-  "/": "index",
-  "/about": "about",
-  "/contact": "contact",
-  "/adventures": "adventures",
-  "/latin-america-2023-trip": "latin-america-2023-trip",
-  "/styles.css": "styles",
-  "/favicon.ico": "favicon",
-  "/assets/favicon.ico": "favicon",
-  "/assets/latin-america-2023-trip/yech-01.jpg": "yech-01",
-};
+const HOMEPAGE_NAME = "index";
 
 const server = Deno.listen({ port: 8080 });
 console.log(`HTTP webserver running. Access it at: http://localhost:8080/`);
@@ -27,82 +15,72 @@ for await (const conn of server) {
 async function serve(conn: Deno.Conn) {
   const httpConn = Deno.serveHttp(conn);
   for await (const requestEvent of httpConn) {
-    const requestUrl = requestEvent.request.url;
-    const path = new URL(requestUrl).pathname;
-    requestEvent.respondWith(await response(path));
+    const requestUrlString = requestEvent.request.url;
+    const requestUrl = new URL(requestUrlString);
+    const path = requestUrl.pathname;
+    const pathResponse = await response(path);
+    if (pathResponse) {
+      requestEvent.respondWith(pathResponse);
+    }
   }
 }
 
 async function response(path: string) {
-  // TODO: read the 'public/pages', 'public/assets', 'public/styles' directory
-  console.log("path", path);
-  switch (path) {
-    case "/":
-    case "/about":
-    case "/contact":
-    case "/adventures":
-    case "/latin-america-2023-trip":
-      return await page(path);
-    case "/styles.css": {
-      return await stylesheet(path);
-    }
-    case "/favicon.ico":
-    case "/assets/favicon.ico": {
-      return await icon(path);
-    }
-    case "/assets/latin-america-2023-trip/yech-01.jpg": {
-      return await image(path);
-    }
-    default: {
-      return await page(path);
-    }
+  // css
+  if (path.endsWith(CSS_FILE_TYPE)) {
+    return await stylesheet(path);
   }
+  // asset
+  if (path.startsWith(ASSETS_DIRECTORY)) {
+    return await image(path);
+  }
+
+  // page
+  const arrayOfPathDirectories = path.split("/");
+  const pathname = arrayOfPathDirectories[arrayOfPathDirectories.length - 1];
+  const directory = `.${PUBLIC_DIRECTORY}${PAGES_DIRECTORY}`;
+
+  const fileName = await findFileName(pathname, directory);
+  return await page(fileName);
 }
 
-async function page(
-  path:
-    | "/"
-    | "/about"
-    | "/contact"
-    | "/adventures"
-    | "latin-america-2023-trip"
-    | string
-) {
-  let page;
-  switch (path) {
-    case "/":
-    case "/about":
-    case "/contact":
-    case "/adventures":
-    case "/latin-america-2023-trip": {
-      page = await Deno.readTextFile(
-        `${SRC_DIRECTORY}/pages/${FILES[path]}${HTML_FILE_TYPE}`
-      );
-      break;
+async function findFileName(path: string, directory: string) {
+  for await (const dirEntry of Deno.readDir(directory)) {
+    const { name, isFile } = dirEntry;
+
+    // special case (homepage)
+    if (isFile && path.length === 0 && name.includes(HOMEPAGE_NAME)) {
+      return name;
     }
-    default: {
-      page = await Deno.readTextFile(
-        `${SRC_DIRECTORY}/pages/404${HTML_FILE_TYPE}`
-      );
+
+    // generic case
+    if (isFile && path.length !== 0 && name.includes(path)) {
+      return name;
     }
   }
 
+  return null;
+}
+
+async function page(path: string | null) {
+  const page = await Deno.readTextFile(
+    `.${PUBLIC_DIRECTORY}${PAGES_DIRECTORY}${path ?? "404"}`
+  );
   const start = await Deno.readTextFile(
-    `${SRC_DIRECTORY}/components/start${TXT_FILE_TYPE}`
+    `.${PUBLIC_DIRECTORY}components/start${TXT_FILE_TYPE}`
   );
   const end = await Deno.readTextFile(
-    `${SRC_DIRECTORY}/components/end${TXT_FILE_TYPE}`
+    `.${PUBLIC_DIRECTORY}components/end${TXT_FILE_TYPE}`
   );
+
   return new Response(`${start}${page}${end}`, {
     headers: { "content-type": "text/html; charset=utf-8" },
     status: 200,
   });
 }
 
-async function stylesheet(path: "/styles.css") {
-  const file = await Deno.readFile(
-    `${SRC_DIRECTORY}${FILES[path]}${CSS_FILE_TYPE}`
-  );
+async function stylesheet(path: string) {
+  const file = await Deno.readFile(`.${PUBLIC_DIRECTORY}${path}`);
   return new Response(file, {
     headers: {
       "content-type": "text/css",
@@ -110,16 +88,7 @@ async function stylesheet(path: "/styles.css") {
   });
 }
 
-async function icon(path: "/favicon.ico" | "/assets/favicon.ico") {
-  const file = await Deno.readFile(
-    `${ASSETS_DIRECTORY}${FILES[path]}${ICO_FILE_TYPE}`
-  );
-  return new Response(file);
-}
-
-async function image(path: "/assets/latin-america-2023-trip/yech-01.jpg") {
-  const file = await Deno.readFile(
-    `${ASSETS_DIRECTORY}latin-america-2023-trip/${FILES[path]}${JPG_FILE_TYPE}`
-  );
+async function image(path: string) {
+  const file = await Deno.readFile(`.${path}`);
   return new Response(file);
 }
