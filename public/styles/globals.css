@@ -17,6 +17,9 @@ body {
   font-family: Palatino, Charter, Helvetica;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 img,
@@ -50,6 +53,15 @@ footer {
   padding-left: 24px;
   padding-right: 24px;
   padding-top: 10px;
+}
+
+footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: auto;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-bottom: 24px;
 }
 
 footer > ul {
