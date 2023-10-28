@@ -3,10 +3,10 @@ const PAGES_DIRECTORY = "pages/";
 const ASSETS_DIRECTORY = "/assets/";
 const TXT_FILE_TYPE = ".txt";
 const CSS_FILE_TYPE = ".css";
-const HOMEPAGE_NAME = "index";
+const INDEX_NAME = "index";
 
 const server = Deno.listen({ port: 8080 });
-console.log(`HTTP webserver running. Access it at: http://localhost:8080/`);
+console.log(`HTTP webserver running. Access it at: http://localhost:8080`);
 
 for await (const conn of server) {
   serve(conn);
@@ -21,11 +21,20 @@ async function serve(conn: Deno.Conn) {
     const pathResponse = await response(path);
     if (pathResponse) {
       requestEvent.respondWith(pathResponse);
+    } else {
+      requestEvent.respondWith(new Response("Server Error"));
     }
   }
 }
 
 async function response(path: string) {
+  console.log("path", path);
+
+  // TODO: figure out if there's a way to get / figure out
+  // the original path of global stylesheet, favicon, etc.
+  // essentially, figure out how to solve the issue of
+  // subdirectories and the side-effects of having them
+
   // css
   if (path.endsWith(CSS_FILE_TYPE)) {
     return await stylesheet(path);
@@ -37,24 +46,40 @@ async function response(path: string) {
 
   // page
   const arrayOfPathDirectories = path.split("/");
-  const pathname = arrayOfPathDirectories[arrayOfPathDirectories.length - 1];
-  const directory = `.${PUBLIC_DIRECTORY}${PAGES_DIRECTORY}`;
+  const pathName = arrayOfPathDirectories[arrayOfPathDirectories.length - 1];
+  let directory = `.${PUBLIC_DIRECTORY}${PAGES_DIRECTORY}`;
 
-  const fileName = await findFileName(pathname, directory);
-  return await page(fileName);
+  // retrieves the correct directory
+  if (arrayOfPathDirectories.length > 2) {
+    let depth = 1;
+    const initialDirectory = directory;
+    while (depth < arrayOfPathDirectories.length - 1) {
+      for await (const dirEntry of Deno.readDir(initialDirectory)) {
+        const { name, isDirectory } = dirEntry;
+        if (isDirectory && arrayOfPathDirectories[depth] === name) {
+          directory = `${directory}${name}/`;
+          break;
+        }
+      }
+      depth += 1;
+    }
+  }
+
+  const filePath = await findFileName(pathName, directory);
+  return await page(filePath, directory);
 }
 
 async function findFileName(path: string, directory: string) {
   for await (const dirEntry of Deno.readDir(directory)) {
-    const { name, isFile } = dirEntry;
+    const { name, isDirectory } = dirEntry;
 
     // special case (homepage)
-    if (isFile && path.length === 0 && name.includes(HOMEPAGE_NAME)) {
+    if (isDirectory && path.length === 0 && name.includes(INDEX_NAME)) {
       return name;
     }
 
     // generic case
-    if (isFile && path.length !== 0 && name.includes(path)) {
+    if (isDirectory && path.length !== 0 && name.includes(path)) {
       return name;
     }
   }
@@ -62,10 +87,11 @@ async function findFileName(path: string, directory: string) {
   return null;
 }
 
-async function page(path: string | null) {
+async function page(path: string | null, directory: string) {
   const page = await Deno.readTextFile(
-    `.${PUBLIC_DIRECTORY}${PAGES_DIRECTORY}${path ?? "404"}`
+    `${directory}${path ?? "404"}/index.html`
   );
+
   const start = await Deno.readTextFile(
     `.${PUBLIC_DIRECTORY}components/start${TXT_FILE_TYPE}`
   );
@@ -90,5 +116,10 @@ async function stylesheet(path: string) {
 
 async function image(path: string) {
   const file = await Deno.readFile(`.${path}`);
-  return new Response(file);
+  return new Response(file, {
+    // TODO: do content type (if its png, or x-icon, etc.)
+    // headers: {
+    //   "content-type": "image/jpeg",
+    // },
+  });
 }
