@@ -23,8 +23,6 @@ async function serve(conn: Deno.Conn) {
     const requestUrl = new URL(requestUrlString);
     const path = requestUrl.pathname;
     const referrer = requestEvent.request.headers.get("referer");
-    // console.log("headers", referrer);
-    // console.log("requestUrl", requestUrl);
     const pathResponse = await response(path, referrer ?? "");
     if (pathResponse) {
       requestEvent.respondWith(pathResponse);
