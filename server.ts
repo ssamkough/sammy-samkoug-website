@@ -5,6 +5,10 @@ const TXT_FILE_TYPE = ".txt";
 const CSS_FILE_TYPE = ".css";
 const INDEX_NAME = "index";
 
+// special files
+const GLOBALS_CSS_FILE = "globals.css";
+const FAVICON_ASSETS_FILE = "favicon.ico";
+
 const server = Deno.listen({ port: 8080 });
 console.log(`HTTP webserver running. Access it at: http://localhost:8080`);
 
@@ -18,7 +22,10 @@ async function serve(conn: Deno.Conn) {
     const requestUrlString = requestEvent.request.url;
     const requestUrl = new URL(requestUrlString);
     const path = requestUrl.pathname;
-    const pathResponse = await response(path);
+    const referrer = requestEvent.request.headers.get("referer");
+    // console.log("headers", referrer);
+    // console.log("requestUrl", requestUrl);
+    const pathResponse = await response(path, referrer ?? "");
     if (pathResponse) {
       requestEvent.respondWith(pathResponse);
     } else {
@@ -27,24 +34,52 @@ async function serve(conn: Deno.Conn) {
   }
 }
 
-async function response(path: string) {
+/**
+ *
+ * @param path
+ * @param referrer
+ * @returns
+ */
+async function response(path: string, referrer: string) {
   console.log("path", path);
-
-  // TODO: figure out if there's a way to get / figure out
-  // the original path of global stylesheet, favicon, etc.
-  // essentially, figure out how to solve the issue of
-  // subdirectories and the side-effects of having them
 
   // css
   if (path.endsWith(CSS_FILE_TYPE)) {
+    console.log("CSS");
+    // "globals.css" located in "/public/styles/" is a special file
+    if (path.endsWith(GLOBALS_CSS_FILE)) {
+      return await stylesheet(`/public/styles/${GLOBALS_CSS_FILE}`);
+    }
     return await stylesheet(path);
   }
+
   // asset
-  if (path.startsWith(ASSETS_DIRECTORY)) {
-    return await image(path);
+  if (path.endsWith(".jpg") || path.endsWith(".png") || path.endsWith(".ico")) {
+    console.log("ASSET");
+    // "favicon.ico" located in "/assets/" is a special file
+    if (path.endsWith(FAVICON_ASSETS_FILE)) {
+      return await image(`/assets/${FAVICON_ASSETS_FILE}`);
+    }
+
+    let modifiedReferrer = referrer;
+    if (referrer.startsWith("http://localhost:8080/")) {
+      modifiedReferrer = modifiedReferrer.replace("http://localhost:8080/", "");
+    }
+    if (referrer.startsWith("https://sammy.pizza/")) {
+      modifiedReferrer = modifiedReferrer.replace("https://sammy.pizza/", "");
+    }
+    if (referrer.startsWith("https://sammysamkough.com/")) {
+      modifiedReferrer = modifiedReferrer.replace(
+        "https://sammysamkough.com/",
+        ""
+      );
+    }
+    const modifiedPath = `/public/pages/${modifiedReferrer}${path}`;
+    return await image(modifiedPath);
   }
 
   // page
+  console.log("PAGE");
   const arrayOfPathDirectories = path.split("/");
   const pathName = arrayOfPathDirectories[arrayOfPathDirectories.length - 1];
   let directory = `.${PUBLIC_DIRECTORY}${PAGES_DIRECTORY}`;
@@ -106,7 +141,7 @@ async function page(path: string | null, directory: string) {
 }
 
 async function stylesheet(path: string) {
-  const file = await Deno.readFile(`.${PUBLIC_DIRECTORY}${path}`);
+  const file = await Deno.readFile(`.${path}`);
   return new Response(file, {
     headers: {
       "content-type": "text/css",
