@@ -1,16 +1,34 @@
+/** ---- CONSTANTS ---- */
+// directories
 const PUBLIC_DIRECTORY = "/public/";
-const PAGES_DIRECTORY = "pages/";
 const ASSETS_DIRECTORY = "/assets/";
+const PAGES_DIRECTORY = "pages/";
+const STYLES_DIRECTORY = "styles/";
+
+// domains
+const LOCALHOST_PORT = 8080;
+const LOCALHOST = `http://localhost:${LOCALHOST_PORT}/`;
+const SAMMY_DOT_PIZZA = "https://sammy.pizza/";
+const SAMMYSAMKOUGH_DOT_COM = "https://sammy.pizza/";
+
+// file types
 const TXT_FILE_TYPE = ".txt";
 const CSS_FILE_TYPE = ".css";
-const INDEX_NAME = "index";
+const JPG_FILE_TYPE = ".jpg";
+const PNG_FILE_TYPE = ".png";
+const ICO_FILE_TYPE = ".ico";
 
 // special files
 const GLOBALS_CSS_FILE = "globals.css";
 const FAVICON_ASSETS_FILE = "favicon.ico";
 
-const server = Deno.listen({ port: 8080 });
-console.log(`HTTP webserver running. Access it at: http://localhost:8080`);
+// naming conventions
+const INDEX_NAME = "index";
+
+/** ---- SERVER ---- */
+
+const server = Deno.listen({ port: LOCALHOST_PORT });
+console.log(`HTTP webserver running. Access it at: ${LOCALHOST}`);
 
 for await (const conn of server) {
   serve(conn);
@@ -33,51 +51,51 @@ async function serve(conn: Deno.Conn) {
 }
 
 /**
- *
- * @param path
- * @param referrer
- * @returns
+ * Proper response depending on the request event from the http connection.
+ * @param path Pathname from the request event request url
+ * @param referrer Referer from the request event request headers
  */
 async function response(path: string, referrer: string) {
-  console.log("path", path);
-
   // css
   if (path.endsWith(CSS_FILE_TYPE)) {
-    console.log("CSS");
     // "globals.css" located in "/public/styles/" is a special file
     if (path.endsWith(GLOBALS_CSS_FILE)) {
-      return await stylesheet(`/public/styles/${GLOBALS_CSS_FILE}`);
+      return await stylesheet(
+        `${PUBLIC_DIRECTORY}${STYLES_DIRECTORY}${GLOBALS_CSS_FILE}`
+      );
     }
     return await stylesheet(path);
   }
 
   // asset
-  if (path.endsWith(".jpg") || path.endsWith(".png") || path.endsWith(".ico")) {
-    console.log("ASSET");
+  if (
+    path.endsWith(JPG_FILE_TYPE) ||
+    path.endsWith(PNG_FILE_TYPE) ||
+    path.endsWith(ICO_FILE_TYPE)
+  ) {
     // "favicon.ico" located in "/assets/" is a special file
     if (path.endsWith(FAVICON_ASSETS_FILE)) {
-      return await image(`/assets/${FAVICON_ASSETS_FILE}`);
+      return await image(
+        `${ASSETS_DIRECTORY}${FAVICON_ASSETS_FILE}`,
+        ICO_FILE_TYPE
+      );
     }
 
     let modifiedReferrer = referrer;
-    if (referrer.startsWith("http://localhost:8080/")) {
-      modifiedReferrer = modifiedReferrer.replace("http://localhost:8080/", "");
+    if (referrer.startsWith(LOCALHOST)) {
+      modifiedReferrer = modifiedReferrer.replace(LOCALHOST, "");
     }
-    if (referrer.startsWith("https://sammy.pizza/")) {
-      modifiedReferrer = modifiedReferrer.replace("https://sammy.pizza/", "");
+    if (referrer.startsWith(SAMMY_DOT_PIZZA)) {
+      modifiedReferrer = modifiedReferrer.replace(SAMMY_DOT_PIZZA, "");
     }
-    if (referrer.startsWith("https://sammysamkough.com/")) {
-      modifiedReferrer = modifiedReferrer.replace(
-        "https://sammysamkough.com/",
-        ""
-      );
+    if (referrer.startsWith(SAMMYSAMKOUGH_DOT_COM)) {
+      modifiedReferrer = modifiedReferrer.replace(SAMMYSAMKOUGH_DOT_COM, "");
     }
-    const modifiedPath = `/public/pages/${modifiedReferrer}${path}`;
+    const modifiedPath = `${PUBLIC_DIRECTORY}${PAGES_DIRECTORY}${modifiedReferrer}${path}`;
     return await image(modifiedPath);
   }
 
   // page
-  console.log("PAGE");
   const arrayOfPathDirectories = path.split("/");
   const pathName = arrayOfPathDirectories[arrayOfPathDirectories.length - 1];
   let directory = `.${PUBLIC_DIRECTORY}${PAGES_DIRECTORY}`;
@@ -122,7 +140,7 @@ async function findFileName(path: string, directory: string) {
 
 async function page(path: string | null, directory: string) {
   const page = await Deno.readTextFile(
-    `${directory}${path ?? "404"}/index.html`
+    `${directory}${path ?? "404"}/${INDEX_NAME}.html`
   );
 
   const start = await Deno.readTextFile(
@@ -147,12 +165,11 @@ async function stylesheet(path: string) {
   });
 }
 
-async function image(path: string) {
+async function image(path: string, fileType?: string) {
   const file = await Deno.readFile(`.${path}`);
   return new Response(file, {
-    // TODO: do content type (if its png, or x-icon, etc.)
-    // headers: {
-    //   "content-type": "image/jpeg",
-    // },
+    headers: {
+      "content-type": fileType ?? "image/jpeg",
+    },
   });
 }
