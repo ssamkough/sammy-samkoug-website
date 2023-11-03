@@ -20,6 +20,7 @@ const PNG_FILE_TYPE = ".png";
 const ICO_FILE_TYPE = ".ico";
 
 // special files
+const RESET_CSS_FILE = "reset.css";
 const GLOBALS_CSS_FILE = "globals.css";
 const FAVICON_ASSETS_FILE = "favicon.ico";
 
@@ -63,6 +64,12 @@ async function response(path: string, referrer: string) {
     if (path.endsWith(GLOBALS_CSS_FILE)) {
       return await stylesheet(
         `${PUBLIC_DIRECTORY}${STYLES_DIRECTORY}${GLOBALS_CSS_FILE}`
+      );
+    }
+    // "reset.css" located in "/public/styles/" is a special file
+    if (path.endsWith(RESET_CSS_FILE)) {
+      return await stylesheet(
+        `${PUBLIC_DIRECTORY}${STYLES_DIRECTORY}${RESET_CSS_FILE}`
       );
     }
     return await stylesheet(path);
