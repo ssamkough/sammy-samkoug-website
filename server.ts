@@ -8,8 +8,9 @@ const STYLES_DIRECTORY = "styles/";
 // domains
 const LOCALHOST_PORT = 8080;
 const LOCALHOST = `http://localhost:${LOCALHOST_PORT}/`;
-const SAMMY_DOT_PIZZA = "https://sammy.pizza/";
-const SAMMYSAMKOUGH_DOT_COM = "https://sammy.pizza/";
+const HTTPS = "https://";
+const SAMMY_DOT_PIZZA = `${HTTPS}sammy.pizza/`;
+const SAMMYSAMKOUGH_DOT_COM = `${HTTPS}sammysamkough.com/`;
 
 // file types
 const TXT_FILE_TYPE = ".txt";
