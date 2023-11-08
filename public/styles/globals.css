@@ -5,6 +5,21 @@ body {
   flex-direction: column;
 }
 
+#skip a {
+  display: block;
+  position: absolute;
+  left: -999px;
+  top: -999px;
+}
+
+#skip a:focus {
+  left: 12px;
+  top: 12px;
+  padding: 3px;
+  background: #ffc;
+  border: 1px solid #990000;
+}
+
 header,
 main,
 footer {

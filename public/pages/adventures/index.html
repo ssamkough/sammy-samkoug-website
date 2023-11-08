@@ -1,6 +1,39 @@
 <h1>adventures</h1>
 <p>dedicated to all the adventures i have been on that i would like to share</p>
 <br />
-<ul>
-  <li><a href="/adventures/argentina-2023-trip">argentina 2023 trip</a></li>
+<ul class="adventures-list">
+  <li>
+    <a href="/adventures/argentina-2023-trip"
+      ><div><h2>argentina 2023 trip</h2></div></a
+    >
+  </li>
 </ul>
+
+<style>
+  .adventures-list {
+    padding: 0px;
+  }
+
+  .adventures-list li {
+    margin: 0px;
+    list-style-type: none;
+  }
+
+  .adventures-list a {
+    text-decoration: none;
+  }
+
+  .adventures-list div {
+    height: 100px;
+    max-width: 600px;
+    min-width: 100px;
+    padding: 16px;
+    border: 1px solid black;
+    border-radius: 4px;
+    background-color: oklch(80% 20% 190);
+  }
+
+  .adventures-list h2 {
+    color: oklch(80%, 80%, 360);
+  }
+</style>

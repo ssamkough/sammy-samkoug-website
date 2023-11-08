@@ -10,6 +10,9 @@
 </head>
 <body>
 <header>
+<div id="skip">
+<a href="#main">skip navigation</a>
+</div>
 <nav>
 <ul>
 <li><a href="/">home</a></li>
@@ -17,4 +20,4 @@
 </ul>
 </nav>
 </header>
-<main>
+<main id="main">

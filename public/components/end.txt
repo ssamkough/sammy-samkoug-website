@@ -1,17 +1,13 @@
 </main>
 <footer>
+<a href="https://datawrapper.dwcdn.net/SAgXc/2/" target="_blank" rel="noopener noreferrer">
 <div id="palestine-flag">
 <div class="red-triangle"></div>
 <div class="black-stripe"></div>
 <div class="white-stripe"></div>
 <div class="green-stripe"></div>
 </div>
-<ul>
-<li><a href="/">home</a></li>
-<li><a href="/about">about</a></li>
-<li><a href="/contact">contact</a></li>
-<li><a href="/adventures">adventures</a></li>
-</ul>
+</a>
 </footer>
 </body>
 </html>
