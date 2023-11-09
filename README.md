@@ -6,6 +6,10 @@ my site
 
 - respond with a not allowed if the css file isnt on the right page (i.e. the about page `index.css` shouldnt run on the home page)
 
+### not as important
+
+- wrap all server awaits around try / catch
+
 ## resources
 
 ### codings
