@@ -1,0 +1,14 @@
+</head>
+<body>
+<header>
+<div id="skip">
+<a href="#main">skip navigation</a>
+</div>
+<nav>
+<ul>
+<li><a href="/">home</a></li>
+<li><a href="/sitemap">sitemap</a></li>
+</ul>
+</nav>
+</header>
+<main id="main">

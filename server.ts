@@ -27,6 +27,13 @@ const FAVICON_ASSETS_FILE = "favicon.ico";
 // naming conventions
 const INDEX_NAME = "index";
 
+// information
+const HEAD_LINKS = `
+<link rel="icon" type="image/x-icon" href="./assets/favicon.ico" />
+\n<link rel="stylesheet" type="text/css" href="./public/styles/reset.css" />
+\n<link rel="stylesheet" type="text/css" href="./public/styles/globals.css" />
+`;
+
 /** ---- SERVER ---- */
 
 const server = Deno.listen({ port: LOCALHOST_PORT });
@@ -147,18 +154,54 @@ async function findFileName(path: string, directory: string) {
 }
 
 async function page(path: string | null, directory: string) {
+  // console.log("path", path);
+  // console.log("directory", directory);
+  const fullDirectoryPath = `${directory}${path ?? "404"}/`;
   const page = await Deno.readTextFile(
-    `${directory}${path ?? "404"}/${INDEX_NAME}.html`
+    `${fullDirectoryPath}${INDEX_NAME}.html`
   );
 
-  const start = await Deno.readTextFile(
-    `.${PUBLIC_DIRECTORY}components/start${TXT_FILE_TYPE}`
-  );
-  const end = await Deno.readTextFile(
-    `.${PUBLIC_DIRECTORY}components/end${TXT_FILE_TYPE}`
+  // beginning of page
+  const one = await Deno.readTextFile(
+    `.${PUBLIC_DIRECTORY}components/1_start_meta${TXT_FILE_TYPE}`
   );
 
-  return new Response(`${start}${page}${end}`, {
+  // adding any links dynamically
+  const indexDotCss = `${fullDirectoryPath}index.css`;
+
+  // does index.css exist?
+  try {
+    await Deno.readTextFile(indexDotCss);
+    await Deno.writeTextFile(
+      `.${PUBLIC_DIRECTORY}components/2_start_links${TXT_FILE_TYPE}`,
+      `${HEAD_LINKS}\n<link rel="stylesheet" type="text/css" href="${indexDotCss}" />`
+    );
+  } catch (e) {
+    if (e instanceof Deno.errors.NotFound) {
+      await Deno.writeTextFile(
+        `.${PUBLIC_DIRECTORY}components/2_start_links${TXT_FILE_TYPE}`,
+        `${HEAD_LINKS}`
+      );
+    }
+  }
+
+  const two = await Deno.readTextFile(
+    `.${PUBLIC_DIRECTORY}components/2_start_links${TXT_FILE_TYPE}`
+  );
+
+  const three = await Deno.readTextFile(
+    `.${PUBLIC_DIRECTORY}components/3_start_header${TXT_FILE_TYPE}`
+  );
+
+  // end of page
+  const four = await Deno.readTextFile(
+    `.${PUBLIC_DIRECTORY}components/4_end_footer${TXT_FILE_TYPE}`
+  );
+
+  const htmlPage = `${one}${two}${three}${page}${four}`;
+  // console.log("htmlPage", htmlPage);
+
+  return new Response(`${htmlPage}`, {
     headers: { "content-type": "text/html; charset=utf-8" },
     status: 200,
   });
