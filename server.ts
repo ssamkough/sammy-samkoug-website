@@ -27,13 +27,6 @@ const FAVICON_ASSETS_FILE = "favicon.ico";
 // naming conventions
 const INDEX_NAME = "index";
 
-// information
-const HEAD_LINKS = `
-<link rel="icon" type="image/x-icon" href="./assets/favicon.ico" />
-\n<link rel="stylesheet" type="text/css" href="./public/styles/reset.css" />
-\n<link rel="stylesheet" type="text/css" href="./public/styles/globals.css" />
-`;
-
 /** ---- SERVER ---- */
 
 const server = Deno.listen({ port: LOCALHOST_PORT });
@@ -154,52 +147,32 @@ async function findFileName(path: string, directory: string) {
 }
 
 async function page(path: string | null, directory: string) {
-  // console.log("path", path);
-  // console.log("directory", directory);
   const fullDirectoryPath = `${directory}${path ?? "404"}/`;
   const page = await Deno.readTextFile(
     `${fullDirectoryPath}${INDEX_NAME}.html`
   );
 
   // beginning of page
-  const one = await Deno.readTextFile(
+  const startOne = await Deno.readTextFile(
     `.${PUBLIC_DIRECTORY}components/1_start_meta${TXT_FILE_TYPE}`
   );
 
-  // adding any links dynamically
-  const indexDotCss = `${fullDirectoryPath}index.css`;
-
-  // does index.css exist?
-  try {
-    await Deno.readTextFile(indexDotCss);
-    await Deno.writeTextFile(
-      `.${PUBLIC_DIRECTORY}components/2_start_links${TXT_FILE_TYPE}`,
-      `${HEAD_LINKS}\n<link rel="stylesheet" type="text/css" href="${indexDotCss}" />`
-    );
-  } catch (e) {
-    if (e instanceof Deno.errors.NotFound) {
-      await Deno.writeTextFile(
-        `.${PUBLIC_DIRECTORY}components/2_start_links${TXT_FILE_TYPE}`,
-        `${HEAD_LINKS}`
-      );
-    }
-  }
-
-  const two = await Deno.readTextFile(
+  // links of the page
+  const startTwo = await Deno.readTextFile(
     `.${PUBLIC_DIRECTORY}components/2_start_links${TXT_FILE_TYPE}`
   );
 
-  const three = await Deno.readTextFile(
+  // closing the head and starting the body
+  const startThree = await Deno.readTextFile(
     `.${PUBLIC_DIRECTORY}components/3_start_header${TXT_FILE_TYPE}`
   );
 
   // end of page
-  const four = await Deno.readTextFile(
+  const endFour = await Deno.readTextFile(
     `.${PUBLIC_DIRECTORY}components/4_end_footer${TXT_FILE_TYPE}`
   );
 
-  const htmlPage = `${one}${two}${three}${page}${four}`;
-  // console.log("htmlPage", htmlPage);
+  const htmlPage = `${startOne}${startTwo}${startThree}${page}${endFour}`;
 
   return new Response(`${htmlPage}`, {
     headers: { "content-type": "text/html; charset=utf-8" },
@@ -208,19 +181,37 @@ async function page(path: string | null, directory: string) {
 }
 
 async function stylesheet(path: string) {
-  const file = await Deno.readFile(`.${path}`);
-  return new Response(file, {
-    headers: {
-      "content-type": "text/css",
-    },
-  });
+  const pathOfFile = `.${path}`;
+  try {
+    const file = await Deno.readFile(pathOfFile);
+    return new Response(file, {
+      headers: {
+        "content-type": "text/css",
+      },
+    });
+  } catch (e) {
+    if (e instanceof Deno.errors.NotFound) {
+      console.log(`File ${pathOfFile} not found`);
+      return new Response(null, { status: 404 });
+    }
+  }
+  return new Response(null, { status: 500 });
 }
 
 async function image(path: string, fileType?: string) {
-  const file = await Deno.readFile(`.${path}`);
-  return new Response(file, {
-    headers: {
-      "content-type": fileType ?? "image/jpeg",
-    },
-  });
+  const pathOfFile = `.${path}`;
+  try {
+    const file = await Deno.readFile(pathOfFile);
+    return new Response(file, {
+      headers: {
+        "content-type": fileType ?? "image/jpeg",
+      },
+    });
+  } catch (e) {
+    if (e instanceof Deno.errors.NotFound) {
+      console.log(`File ${pathOfFile} not found`);
+      return new Response(null, { status: 404 });
+    }
+  }
+  return new Response(null, { status: 500 });
 }

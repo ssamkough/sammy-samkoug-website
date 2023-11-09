@@ -1,8 +1,6 @@
-
 <link rel="icon" type="image/x-icon" href="./assets/favicon.ico" />
-
 <link rel="stylesheet" type="text/css" href="./public/styles/reset.css" />
-
 <link rel="stylesheet" type="text/css" href="./public/styles/globals.css" />
-
+<link rel="stylesheet" type="text/css" href="./public/pages/about/index.css" />
+<link rel="stylesheet" type="text/css" href="./public/pages/adventures/index.css" />
 <link rel="stylesheet" type="text/css" href="./public/pages/index/index.css" />
