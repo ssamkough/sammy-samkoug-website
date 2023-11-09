@@ -1,0 +1,10 @@
+div {
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+div > time {
+  font-style: italic;
+}

@@ -1,13 +1,25 @@
-div > section {
-  max-width: 400px;
+a:has(section) {
+  width: 300px;
+  color: inherit;
+  text-decoration: inherit;
+}
+
+div section {
   height: 100px;
   padding: 20px;
   border: 1px solid black;
   border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 div:has(section) {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 16px;
+}
+
+.featured {
+  border-style: dashed;
 }
