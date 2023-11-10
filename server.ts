@@ -72,6 +72,23 @@ async function response(path: string, referrer: string) {
         `${PUBLIC_DIRECTORY}${STYLES_DIRECTORY}${RESET_CSS_FILE}`
       );
     }
+
+    // only accept `index.css` that is located in the same directory
+    // as the page (which we get from the referrer)
+    // we also need to account for the root page which is "/", and we
+    // call it `index`
+    const splitReferrer = referrer.split("/");
+    const pageName = `${
+      splitReferrer[splitReferrer.length - 1] === ""
+        ? INDEX_NAME
+        : splitReferrer[splitReferrer.length - 1]
+    }/`;
+
+    // return null if the `index.css` file isn't from the same directory as the page
+    if (path.includes(PAGES_DIRECTORY) && !path.includes(pageName)) {
+      return new Response(null, { status: 500 });
+    }
+
     return await stylesheet(path);
   }
 
