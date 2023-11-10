@@ -20,3 +20,4 @@ my site
 ### devops
 
 - https://answers.netlify.com/t/support-guide-can-i-run-a-web-server-http-listener-and-or-database-at-netlify/3078
+- https://docs.deno.com/deploy/api/runtime-fs
