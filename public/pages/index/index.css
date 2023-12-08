@@ -33,5 +33,5 @@ div:has(section) {
 }
 
 .featured {
-  border-style: dashed;
+  border-color: fuchsia;
 }
