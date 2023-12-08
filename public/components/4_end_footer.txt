@@ -1,5 +1,6 @@
 </main>
 <footer>
+<hr />
 <a href="https://datawrapper.dwcdn.net/SAgXc/2/" target="_blank" rel="noopener noreferrer">
 <div id="palestine-flag">
 <div class="red-triangle"></div>
