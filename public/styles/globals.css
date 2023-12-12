@@ -84,3 +84,14 @@ header > nav > ul {
 #palestine-flag > .green-stripe {
   background-color: #268024;
 }
+
+.reading-block {
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+time {
+  font-style: italic;
+}
