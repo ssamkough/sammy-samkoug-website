@@ -4,12 +4,6 @@ a:has(section) {
   text-decoration: inherit;
 }
 
-.a-firefox-does-not-support-has-yet {
-  width: 300px;
-  color: inherit;
-  text-decoration: inherit;
-}
-
 div section {
   height: 100px;
   padding: 20px;
@@ -26,12 +20,14 @@ div:has(section) {
   gap: 16px;
 }
 
-.div-firefox-does-not-support-has-yet {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
 .featured {
   border-color: fuchsia;
+  border-width: 2px;
+}
+
+.home-cards {
+  max-width: 1000px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
 }
