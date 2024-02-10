@@ -29,28 +29,17 @@ const INDEX_NAME = "index";
 
 /** ---- SERVER ---- */
 
-const server = Deno.listen({ port: LOCALHOST_PORT });
-console.log(`HTTP webserver running. Access it at: ${LOCALHOST}`);
-
-for await (const conn of server) {
-  serve(conn);
-}
-
-async function serve(conn: Deno.Conn) {
-  const httpConn = Deno.serveHttp(conn);
-  for await (const requestEvent of httpConn) {
-    const requestUrlString = requestEvent.request.url;
-    const requestUrl = new URL(requestUrlString);
-    const path = requestUrl.pathname;
-    const referrer = requestEvent.request.headers.get("referer");
-    const pathResponse = await response(path, referrer ?? "");
-    if (pathResponse) {
-      requestEvent.respondWith(pathResponse);
-    } else {
-      requestEvent.respondWith(new Response("Server Error"));
-    }
+Deno.serve({ port: LOCALHOST_PORT }, async (request) => {
+  const requestUrlString = request.url;
+  const requestUrl = new URL(requestUrlString);
+  const path = requestUrl.pathname;
+  const referrer = request.headers.get("referer");
+  const pathResponse = await response(path, referrer ?? "");
+  if (pathResponse) {
+    return pathResponse;
   }
-}
+  return new Response("Server Error");
+});
 
 /**
  * Proper response depending on the request event from the http connection.
