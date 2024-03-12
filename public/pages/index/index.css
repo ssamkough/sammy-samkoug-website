@@ -21,7 +21,6 @@ div:has(section) {
 }
 
 .featured {
-  border-color: fuchsia;
   border-width: 2px;
 }
 

@@ -103,3 +103,15 @@ time {
 .systems-text {
   color: #56d595;
 }
+
+.fp-free-text {
+  color: hsla(124, 100%, 25%, 1);
+}
+
+.fp-palestine-text {
+  color: hsla(3, 100%, 47%, 1);
+}
+
+.ftrtts-text {
+  color: hsla(217, 100%, 47%, 1);
+}
