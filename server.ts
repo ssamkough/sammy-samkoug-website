@@ -117,8 +117,8 @@ async function response(path: string, referrer: string) {
   // retrieves the correct directory
   if (arrayOfPathDirectories.length > 2) {
     let depth = 1;
-    const initialDirectory = directory;
     while (depth < arrayOfPathDirectories.length - 1) {
+      const initialDirectory = directory;
       for await (const dirEntry of Deno.readDir(initialDirectory)) {
         const { name, isDirectory } = dirEntry;
         if (isDirectory && arrayOfPathDirectories[depth] === name) {
