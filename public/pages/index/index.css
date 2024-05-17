@@ -31,3 +31,8 @@ div:has(section) {
   gap: 16px;
   margin-bottom: 16px;
 }
+
+.body-link-item {
+  padding: 10px;
+  border: 2px dotted black;
+}
