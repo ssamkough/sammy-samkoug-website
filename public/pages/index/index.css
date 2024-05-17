@@ -32,7 +32,17 @@ div:has(section) {
   margin-bottom: 16px;
 }
 
-.body-link-item {
+.body-links {
+  margin: 0;
+  padding: 20px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  list-style-type: none;
+  font-size: 1.4em;
+}
+
+.body-links li {
   padding: 10px;
   border: 2px dotted black;
 }
