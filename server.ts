@@ -13,8 +13,9 @@ const SAMMY_DOT_PIZZA = `${HTTPS}sammy.pizza/`;
 const SAMMYSAMKOUGH_DOT_COM = `${HTTPS}sammysamkough.com/`;
 
 // file types
-const TXT_FILE_TYPE = ".txt";
 const CSS_FILE_TYPE = ".css";
+const JS_FILE_TYPE = ".js";
+const TXT_FILE_TYPE = ".txt";
 const JPG_FILE_TYPE = ".jpg";
 const PNG_FILE_TYPE = ".png";
 const ICO_FILE_TYPE = ".ico";
@@ -47,6 +48,29 @@ Deno.serve({ port: LOCALHOST_PORT }, async (request) => {
  * @param referrer Referer from the request event request headers
  */
 async function response(path: string, referrer: string) {
+  // TODO: make this work
+  // js
+  if (path.endsWith(JS_FILE_TYPE)) {
+    // only accept `index.js` that is located in the same directory
+    // as the page (which we get from the referrer)
+    // we also need to account for the root page which is "/", and we
+    // call it `index`
+    const splitReferrer = referrer.split("/");
+    const pageName = `${
+      splitReferrer[splitReferrer.length - 1] === ""
+        ? INDEX_NAME
+        : splitReferrer[splitReferrer.length - 1]
+    }/`;
+
+    // return null if the `index.js` file isn't from the same directory as the page
+    if (path.includes(PAGES_DIRECTORY) && !path.includes(pageName)) {
+      return new Response(null, { status: 500 });
+    }
+
+    return await script(path);
+  }
+
+  // TODO: doesnt work properly fix
   // css
   if (path.endsWith(CSS_FILE_TYPE)) {
     // "globals.css" located in "/public/styles/" is a special file
@@ -184,6 +208,24 @@ async function page(path: string | null, directory: string) {
     headers: { "content-type": "text/html; charset=utf-8" },
     status: 200,
   });
+}
+
+async function script(path: string) {
+  const pathOfFile = `.${path}`;
+  try {
+    const file = await Deno.readFile(pathOfFile);
+    return new Response(file, {
+      headers: {
+        "content-type": "text/javascript",
+      },
+    });
+  } catch (e) {
+    if (e instanceof Deno.errors.NotFound) {
+      console.log(`File ${pathOfFile} not found`);
+      return new Response(null, { status: 404 });
+    }
+  }
+  return new Response(null, { status: 500 });
 }
 
 async function stylesheet(path: string) {

@@ -50,7 +50,7 @@
 </ul>
 <br />
 
-<h2>...</h2>
+<h2><span id="days-passed">...</span></h2>
 <br />
 
 <iframe
@@ -62,3 +62,16 @@
   style="max-width: 500px; width: 100%; height: 500px; overflow: auto"
 >
 </iframe>
+
+<script>
+  const firstDate = new Date("2023-10-08");
+  const secondDate = new Date();
+  const daysPassed = Math.round(
+    (secondDate - firstDate) / (1000 * 60 * 60 * 24)
+  );
+  const daysPassedElement = document.getElementById("days-passed");
+
+  if (daysPassed && daysPassedElement) {
+    daysPassedElement.innerHTML = `it's been ${daysPassed} days of genocide`;
+  }
+</script>
