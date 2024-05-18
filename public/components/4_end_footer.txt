@@ -1,8 +1,7 @@
 </main>
 <footer>
 <hr />
-<div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 8px;>
-<a href="https://datawrapper.dwcdn.net/SAgXc/2/" target="_blank" rel="noopener noreferrer">
+<a href="/palestine">
 <div id="palestine-flag">
 <div class="red-triangle"></div>
 <div class="black-stripe"></div>
@@ -10,8 +9,6 @@
 <div class="green-stripe"></div>
 </div>
 </a>
-<em>sammy samkough's website</em>
-</div>
 </footer>
 </body>
 </html>
