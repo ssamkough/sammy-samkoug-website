@@ -1,0 +1,8 @@
+.main-message {
+  max-width: 800px;
+  overflow-wrap: break-word;
+  -webkit-nbsp-mode: space;
+  line-break: after-white-space;
+  border: 2px inset black;
+  padding: 20px;
+}

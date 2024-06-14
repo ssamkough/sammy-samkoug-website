@@ -32,15 +32,6 @@ div:has(section) {
   margin-bottom: 16px;
 }
 
-.main-message {
-  max-width: 800px;
-  overflow-wrap: break-word;
-  -webkit-nbsp-mode: space;
-  line-break: after-white-space;
-  border: 2px inset black;
-  padding: 20px;
-}
-
 .body-links {
   margin: 0;
   padding: 20px 0;
